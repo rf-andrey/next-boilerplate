@@ -1,7 +1,7 @@
-import prisma from "@/lib/prisma";
-import { compare } from "bcrypt";
 import NextAuth, { type NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+
+import { signInUseCase } from "@/modules/user/user.use-case";
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -23,24 +23,10 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email,
-          },
-        });
-
-        if (!user) {
-          return null;
-        }
-
-        const isPasswordValid = await compare(
-          credentials.password,
-          user.password
+        const user = await signInUseCase(
+          credentials.email,
+          credentials.password
         );
-
-        if (!isPasswordValid) {
-          return null;
-        }
 
         return {
           id: user.id + "",
@@ -50,6 +36,9 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
+  pages: {
+    signIn: "/login",
+  },
   callbacks: {
     session: ({ session, token }) => {
       session.user = token.user as any;

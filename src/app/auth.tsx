@@ -1,9 +1,10 @@
 "use client";
 
 import { signIn, signOut } from "next-auth/react";
+import Link from "next/link";
 
 export const LoginButton = () => {
-  return <button onClick={() => signIn()}>Sign in</button>;
+  return <Link href="/login">Sign in</Link>;
 };
 
 export const LogoutButton = () => {
